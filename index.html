@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <title>dojou</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <style type="text/css">
+    @font-face {
+      font-family: 'Noto Sans JP';
+      font-style: normal;
+      font-weight: 400;
+      src: local("Noto Sans CJK JP"),
+      url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff2) format('woff2'),
+      url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff) format('woff'),
+      url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.otf) format('opentype');
+    }
+
+    .book-enter-active {
+      transition: all .5s ease-out;
+    }
+
+    .book-leave-active {
+      transition: all .1s ease-out;
+    }
+
+    .book-enter,
+    .book-leave-to {
+      opacity: 0;
+      transform: translateY(1em);
+    }
+
+    .book-move {
+      transition: all .5s ease-out;
+    }
+
+    .flex-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      height: 100%;
+      background: #EEE;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #app {
+      position: relative;
+      min-width: 380px;
+      min-height: 100%;
+      width: 100%;
+    }
+
+    .flex-container {
+      flex: 1;
+      max-width: 960px;
+      width: 80%;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #show-button {
+      background: #EEE;
+      color: #222;
+      border: solid 1px #222;
+      width: 75%;
+      padding: .8em;
+      margin-top: 1em;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #show-button:hover {
+      background: #222;
+      border: solid 1px #EEE;
+      color: #EEE;
+      transition: .2s;
+    }
+
+    @media screen and (max-width:640px) {
+      .flex-screen-direction {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .flex-detail-border {
+        margin-top: 1em;
+        padding-top: 1em;
+        border-top: 1px dotted #222;
+      }
+    }
+
+    @media screen and (min-width: 641px) {
+      .flex-screen-direction {
+        display: flex;
+        flex-direction: row;
+      }
+      .flex-detail-border {
+        margin-left: 1em;
+        padding-left: 1em;
+        border-left: 1px dotted #222;
+      }
+    }
+
+    .book {
+      position: relative;
+      width: 100%;
+      min-height: 400px;
+      margin: 1em 0;
+      padding: 1em;
+      border-top: 1px solid #222;
+    }
+
+    .cover {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cover img {
+      max-width: 200px;
+      width: 100%;
+    }
+
+    .detail-box {}
+
+    .detail {
+      flex: 1;
+      justify-content: space-between;
+      color: #222;
+      font-family: "Noto Sans JP", sans-serif;
+      font-feature-settings: "palt";
+    }
+
+    .title {
+      font-size: 1.8em;
+      font-weight: 900;
+    }
+
+    .pub {
+      display: flex;
+    }
+
+    .publisher,
+    .author,
+    .isbn {
+      font-size: .8em;
+      font-weight: 700;
+    }
+
+    .author {
+      margin-bottom: .5em;
+    }
+
+    .isbn:before {
+      margin-left: .5em;
+      content: "ISBN:"
+    }
+
+    .content {
+      color: #222;
+      text-indent: 1em;
+      letter-spacing: .1em;
+      font-size: .8em;
+      margin-bottom: .5em;
+    }
+
+    .link {
+      display: flex;
+    }
+
+    .amazon,
+    .tweet {
+      background: #222;
+      color: #EEE;
+      font-size: .8em;
+      padding: .2em .8em;
+      margin-right: .5em;
+      border-radius: .5em;
+      text-decoration: none;
+    }
+
+    .amazon:hover,
+    .tweet:hover {
+      background: #EEE;
+      color: #222;
+      transition: all .1s ease-out;
+    }
+
+    .bernard-box {
+      display: flex;
+      margin-top: .5em;
+    }
+
+    .bernard-detail {
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .baloon-box {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .baloon {
+      max-width: 21em;
+      right: 0;
+      color: #EEE;
+      position: relative;
+      text-align: center;
+      width: 100%;
+      border-radius: 12px;
+      font-size: .8em;
+      padding: .8em;
+    }
+
+    .baloon:before {
+      content: "";
+      position: absolute;
+      top: 80%;
+      left: 98.5%;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-right: 20px solid transparent;
+      transform: rotate(20deg);
+    }
+
+    .baloon-1 {
+      background: #DC281A;
+    }
+
+    .baloon-1:before {
+      border-left: 20px solid #DC281A;
+    }
+
+    .baloon-2 {
+      background: #2098D8;
+    }
+
+    .baloon-2:before {
+      border-left: 20px solid #2098D8;
+    }
+
+    .baloon-3 {
+      background: #24DE50;
+    }
+
+    .baloon-3:before {
+      border-left: 20px solid #24DE50;
+    }
+
+    .bernard-icon {
+      width: 150px;
+      height: 150px;
+    }
+
+    .icon {
+      width: 100%;
+      height: 100%;
+    }
+
+    .icon-1 {
+      background: url("img/character-icon/1.png") no-repeat;
+    }
+
+    .icon-2 {
+      background: url("img/character-icon/2.png") no-repeat;
+    }
+
+    .icon-3 {
+      background: url("img/character-icon/3.png") no-repeat;
+    }
+
+    .icon-4 {
+      background: url("img/character-icon/4.png") no-repeat;
+    }
+
+    .loading-enter-active,
+    .loading-leave-active {
+      opacity: 0;
+      transition: all .5s;
+    }
+
+    .loading-box {
+      position: fixed;
+      z-index: 9998;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #EEE;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .load-icon {
+      width: 50px;
+      height: 50px;
+      background: url("img/load.svg") no-repeat;
+    }
+
+    .transition-span {
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .flex-app {
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .flex-header {
+      width: 100%;
+      height: 4em;
+      color: #222;
+      border-bottom: 1px solid #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .flex-header h1 {
+      margin-left: .5em;
+      font-size: 1.4em;
+      font-weight: 900;
+    }
+
+    .flex-header h1 a {
+      color: #222;
+      text-decoration: none;
+    }
+
+    .flex-footer {
+      width: 100%;
+      height: 4em;
+      font-size: .8em;
+      color: #EEE;
+      background-color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .flex-footer a {
+      font-size: .8em;
+      text-decoration: none;
+      color: #EEE;
+    }
+
+    .flex-footer a:hover {
+      text-decoration: none;
+      color: #ff4040;
+    }
+
+    .flex-footer span {
+      color: #EEE;
+      font-size: .8em;
+      margin: .5em;
+    }
+
+    .flex-nav {
+      margin-right: 1em;
+    }
+
+    .flex-nav ul {
+      list-style-type: none;
+    }
+
+    .flex-nav li {
+      position: relative;
+      display: inline-block;
+      font-size: .8em;
+      margin-left: .5em;
+    }
+
+    .flex-nav li a {
+      color: #222;
+      text-decoration: none;
+    }
+
+    .flex-nav li:after {
+      content: '';
+      display: block;
+      position: absolute;
+      background-color: #222;
+      width: 0;
+      height: 1px;
+      bottom: 0;
+      left: 0;
+      transition: .2s all;
+    }
+
+    .flex-nav li:hover:after {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="flex-column flex-app">
+    <transition name="loading">
+      <div class="loading-box" v-if="isLoading">
+        <span class="load-icon" />
+      </div>
+    </transition>
+    <header class="flex-header">
+      <h1>
+        <a :href="url">dojou</a>
+      </h1>
+      <nav class="flex-nav">
+        <ul>
+          <li>
+            <a href="https://gomiokiba.com/" target="_blank" rel="noreferrer noopener">ごみおきば</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="flex-container flex-column">
+      <transition-group name="book" class="transition-span flex-column">
+        <span id="show-button" v-on:click="showBook" key="show-button">
+          ド嬢の一冊
+        </span>
+        <div class="book flex-screen-direction" v-for="res in results" :key="res.isbn">
+          <div class="cover">
+            <img :src="res.cover" />
+          </div>
+          <div class="detail flex-column flex-detail-border">
+            <div class="detail-box flex-column">
+              <div class="title">{{ res.title }}</div>
+              <div class="pub">
+                <div class="publisher">{{ res.publisher }}: {{ res.pubdate }}</div>
+                <div class="isbn">{{ res.isbn }}</div>
+              </div>
+              <div class="author">{{ res.author }}</div>
+              <div class="content" v-if="res.content">{{ res.content }}</div>
+            </div>
+            <div class="bernard-box">
+              <div class="bernard-detail flex-column">
+                <div class="baloon-box">
+                  <div class="baloon" :class="res.balloonClass">{{ res.bernardInfo }}</div>
+                </div>
+                <div class="link">
+                  <a :href="res.amazon" class="amazon" target="_blank">Amazon</a>
+                  <a :href="res.tweet" class="tweet" onClick="window.open(encodeURI(decodeURI(this.href)), 'tweetwindow',
+                'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow">
+                    Tweet
+                  </a>
+                </div>
+              </div>
+              <div class="bernard-icon flex-column">
+                <div class="icon" :class="res.iconClass" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition-group>
+    </div>
+  </div>
+  <footer class="flex-footer">
+    <span class="copyright">
+      <a href="https://twitter.com/gomihitosi" target="_blank" rel="noreferrer noopener">@gomihitosi</a>
+    </span>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+
+  <script>
+    const vm = new Vue({
+      el: '#app',
+      data: {
+        isLoading: true,
+        url: location.href.replace(/\?.*$/, ""),
+        books: [],
+        results: []
+      },
+      mounted: function () {
+        this.getJson()
+      },
+      methods: {
+        showBook: function () {
+          let isbn = this.books[Math.floor(Math.random() * this.books.length)].isbn
+          this.getData(isbn)
+        },
+        getJson: function () {
+          axios.get('./data.json')
+            .then(function (res) {
+              vm.books = res.data.books
+              vm.isLoading = false
+
+              let param = location.search.match(/isbn=(.*?)(&|$)/)
+              if (param && param[1]) {
+                vm.getData(param[1])
+              }
+            })
+            .catch(function (err) {
+              console.log(err)
+            })
+        },
+        getData: function (isbn) {
+          let orig = vm.books.filter(v => v.isbn == isbn)[0]
+          if (!orig || !isbn) return
+
+          axios.get("https://api.openbd.jp/v1/get?isbn=" + isbn)
+            .then((res) => {
+              let v = res.data[0]
+              if (v) {
+                const bernardInfo = `バーナード嬢曰く。${orig.roll}巻${orig.page ? ' ' + orig.page + 'ページ' : ''}${orig.frame ? ' ' + orig.frame + 'コマ' : ''}`
+                this.results.unshift({
+                  id: orig.id,
+                  publisher: v.summary.publisher,
+                  isbn: v.summary.isbn,
+                  pubdate: v.summary.pubdate,
+                  author: v.summary.author,
+                  title: v.summary.title,
+                  cover: v.summary.cover ? v.summary.cover : 'img/nocover.jpg',
+                  content: v.onix.CollateralDetail.TextContent
+                    ? v.onix.CollateralDetail.TextContent[0].Text : '',
+                  amazon: `http://amazon.jp/dp/${orig.isbn}`,
+                  iconClass: 'icon-' + orig.character,
+                  balloonClass: 'baloon-' + orig.roll,
+                  bernardInfo: bernardInfo,
+                  tweet: `http://twitter.com/share?text=「${v.summary.title}」は一度も読んでないけど、私の中ではすでに読破したっぽいフンイキになっている！！&url=${location.origin}?isbn=${orig.isbn}&hashtags=ド嬢の一冊`,
+                })
+              }
+            }).then(() => {
+              if (this.results.length === 0) {
+                console.log(this.orig.isbn)
+              }
+            })
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
