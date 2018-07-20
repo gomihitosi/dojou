@@ -119,6 +119,10 @@
       border-top: 1px solid #222;
     }
 
+    .book:last-child {
+      border-bottom: 1px solid #222;
+    }
+
     .cover {
       display: flex;
       justify-content: center;
@@ -503,6 +507,8 @@
               let param = location.search.match(/isbn=(.*?)(&|$)/)
               if (param && param[1]) {
                 vm.getData(param[1])
+              } else {
+                vm.showBook()
               }
             })
             .catch(function (err) {
