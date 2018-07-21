@@ -130,8 +130,9 @@
     }
 
     .cover img {
-      max-width: 200px;
-      width: 100%;
+      width: 200px;
+      height: 300px;
+      object-fit: contain;
     }
 
     .detail-box {}
@@ -409,6 +410,25 @@
     .flex-nav li:hover:after {
       width: 100%;
     }
+
+    .status-bar {
+      width: 100%;
+      color: #EEE;
+      background-color: #222;
+      font-size: .5rem;
+      text-align: center;
+      position: absolute;
+    }
+
+    .status-enter-active,
+    .status-leave-active {
+      transition: all .1s;
+    }
+
+    .status-enter,
+    .status-leave-to {
+      opacity: 0;
+    }
   </style>
 </head>
 
@@ -417,6 +437,11 @@
     <transition name="loading">
       <div class="loading-box" v-if="isLoading">
         <span class="load-icon" />
+      </div>
+    </transition>
+    <transition name="status">
+      <div class="status-bar" v-if="isNotFound">
+        書籍情報が見つかりませんでした
       </div>
     </transition>
     <header class="flex-header">
@@ -487,6 +512,7 @@
       data: {
         isLoading: true,
         url: location.href.replace(/\?.*$/, ""),
+        isNotFound: false,
         books: [],
         results: []
       },
@@ -523,6 +549,7 @@
             .then((res) => {
               let v = res.data[0]
               if (v) {
+                vm.isNotFound = false
                 const bernardInfo = `バーナード嬢曰く。${orig.roll}巻${orig.page ? ' ' + orig.page + 'ページ' : ''}${orig.frame ? ' ' + orig.frame + 'コマ' : ''}`
                 this.results.unshift({
                   id: orig.id,
@@ -540,10 +567,8 @@
                   bernardInfo: bernardInfo,
                   tweet: `http://twitter.com/share?text=「${v.summary.title}」は一度も読んでないけど、私の中ではすでに読破したっぽいフンイキになっている！！&url=${vm.url}?isbn=${orig.isbn}&hashtags=ド嬢の一冊`,
                 })
-              }
-            }).then(() => {
-              if (this.results.length === 0) {
-                console.log(this.orig.isbn)
+              } else {
+                vm.isNotFound = true
               }
             })
         }
